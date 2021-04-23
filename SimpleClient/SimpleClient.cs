@@ -22,7 +22,7 @@ namespace socketC
             //IPAddress ipAddress = ipHostInfo.AddressList[0];
             //IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
 
-            byte[] tagetIP = { 255,255,255,255 };   //サーバIP
+            byte[] tagetIP = { 172,16,23,60 };   //サーバIP
             IPAddress ipAddress= new IPAddress(tagetIP);
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
 
@@ -31,8 +31,15 @@ namespace socketC
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             //接続する。失敗するとエラーで落ちる。
-            socket.Connect(remoteEP);
-
+            try
+            {
+                socket.Connect(remoteEP);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Connect Faild{e.ToString()}");
+                return;
+            }
             //Sendで送信している。
             byte[] msg = Encoding.UTF8.GetBytes(st + "<EOF>");
             socket.Send(msg);
