@@ -17,10 +17,15 @@ namespace socketC
 
         public static void SocketClient(string st)
         {
-            //IPアドレスやポートを設定している。
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            //IPアドレスやポートを設定(自PC、ポート:11000）
+            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            //IPAddress ipAddress = ipHostInfo.AddressList[0];
+            //IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
+
+            byte[] tagetIP = { 255,255,255,255 };   //サーバIP
+            IPAddress ipAddress= new IPAddress(tagetIP);
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
+
 
             //ソケットを作成
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
