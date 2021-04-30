@@ -22,12 +22,6 @@ namespace socketC
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
 
-            /*
-             byte[] tagetIP = { 172,16,23,60 };   //サーバIP
-            IPAddress ipAddress= new IPAddress(tagetIP);
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-            */
-
             //ソケットを作成
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
