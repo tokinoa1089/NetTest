@@ -9,6 +9,7 @@ namespace socketC
     {
         public static void Main()
         {
+            Console.WriteLine("[SimpleClientSelectHost]");
             //今回送るHello World!
             string st = "Hello World!";
             SocketClient(st);
@@ -18,15 +19,12 @@ namespace socketC
         public static void SocketClient(string st)
         {
             //IPアドレスやポートを設定(自PC、ポート:11000）
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            //IPAddress ipAddress = ipHostInfo.AddressList[0];
+            Console.Write("Input IP address to connect:");
+            var ipAddress = IPAddress.Parse(Console.ReadLine());
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
 
-            /*
-             byte[] tagetIP = { 172,16,23,60 };   //サーバIP
-            IPAddress ipAddress= new IPAddress(tagetIP);
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-            */
 
             //ソケットを作成
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -57,3 +55,4 @@ namespace socketC
         }
     }
 }
+
