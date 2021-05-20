@@ -9,6 +9,7 @@ namespace socketS
     {
         public static void Main()
         {
+            Console.WriteLine("SimpleHost");
             SocketServer();
             Console.ReadKey();
         }
@@ -20,7 +21,7 @@ namespace socketS
             byte[] bytes = new byte[1024];
             string hostName = Dns.GetHostName();
             IPHostEntry ipHostInfo = Dns.GetHostEntry(hostName);
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPAddress ipAddress = ipHostInfo.AddressList[1];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
             //ここまでIPアドレスやポートの設定
 
