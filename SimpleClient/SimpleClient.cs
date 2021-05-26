@@ -11,22 +11,19 @@ namespace socketC
         {
             //今回送るHello World!
             string st = "Hello World!";
+            Console.WriteLine("SimpleClient");
             SocketClient(st);
+            Console.ReadKey();
         }
 
 
         public static void SocketClient(string st)
         {
             //IPアドレスやポートを設定(自PC、ポート:11000）
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            string hostName = Dns.GetHostName();
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(hostName);
+            IPAddress ipAddress = ipHostInfo.AddressList[1];
             IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-
-            /*
-             byte[] tagetIP = { 172,16,23,60 };   //サーバIP
-            IPAddress ipAddress= new IPAddress(tagetIP);
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, 11000);
-            */
 
             //ソケットを作成
             Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);

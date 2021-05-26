@@ -9,6 +9,7 @@ namespace socketS
     {
         public static void Main()
         {
+            Console.WriteLine("SimpleHost");
             SocketServer();
             Console.ReadKey();
         }
@@ -18,8 +19,9 @@ namespace socketS
             //ここからIPアドレスやポートの設定
             // 着信データ用のデータバッファー。
             byte[] bytes = new byte[1024];
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            string hostName = Dns.GetHostName();
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(hostName);
+            IPAddress ipAddress = ipHostInfo.AddressList[1];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
             //ここまでIPアドレスやポートの設定
 
