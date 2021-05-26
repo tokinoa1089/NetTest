@@ -29,7 +29,7 @@ namespace socketS
             listener.Bind(localEndPoint);
             listener.Listen(10);
 
-            //通信の確率
+            //通信の確立
             Socket handler = listener.Accept();
 
 
