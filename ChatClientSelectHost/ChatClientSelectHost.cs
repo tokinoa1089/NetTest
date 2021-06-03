@@ -59,6 +59,13 @@ namespace ChatClientSelectHost
                 Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
                 return;
             }
+            if (bytesRec == 0)
+            {
+                Console.WriteLine("異常なデータ受信（0バイト）");
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+                return;
+            }
             string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
             Console.WriteLine($"Host:{data1}");
 

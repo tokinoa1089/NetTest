@@ -53,6 +53,13 @@ namespace ChatHostAnyListen
                 Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
                 return;
             }
+            if (bytesRec == 0)
+            {
+                Console.WriteLine("異常なデータ受信（0バイト）");
+                handler.Shutdown(SocketShutdown.Both);
+                handler.Close();
+                return;
+            }
 
             string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
             Console.WriteLine($"Client:{data1}");
