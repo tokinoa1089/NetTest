@@ -42,10 +42,18 @@ namespace ChatHostAnyListen
             //通信の確立
             Socket handler = listener.Accept();
 
-
             // 任意の処理
             //データの受取をReceiveで行う。
-            int bytesRec = handler.Receive(bytes);
+            int bytesRec;
+            try {
+                bytesRec = handler.Receive(bytes);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
+                return;
+            }
+
             string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
             Console.WriteLine($"Client:{data1}");
 

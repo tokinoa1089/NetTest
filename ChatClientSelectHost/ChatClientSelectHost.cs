@@ -49,7 +49,16 @@ namespace ChatClientSelectHost
 
             //Receiveで受信している。
             byte[] bytes = new byte[1024];
-            int bytesRec = socket.Receive(bytes);
+            int bytesRec;
+            try
+            {
+                bytesRec = socket.Receive(bytes);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
+                return;
+            }
             string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
             Console.WriteLine($"Host:{data1}");
 
