@@ -41,7 +41,7 @@ namespace socketC
             }
             //Sendで送信している。
             byte[] msg = Encoding.UTF8.GetBytes(st + "<EOF>");
-            socket.Send(msg);
+            int sent = socket.Send(msg);
 
             //Receiveで受信している。
             byte[] bytes = new byte[1024];
