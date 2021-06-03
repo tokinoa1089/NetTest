@@ -41,7 +41,7 @@ namespace ChatClientSelectHost
             }
 
             //文字列を入力
-            Console.Write("送信する文字：");
+            Console.Write("Client：");
             string inputSt = Console.ReadLine();
             //Sendで送信している。
             byte[] msg = Encoding.UTF8.GetBytes(inputSt + "<EOF>");
@@ -51,7 +51,7 @@ namespace ChatClientSelectHost
             byte[] bytes = new byte[1024];
             int bytesRec = socket.Receive(bytes);
             string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
-            Console.WriteLine(data1);
+            Console.WriteLine($"Host:{data1}");
 
             //ソケットを終了している。
             socket.Shutdown(SocketShutdown.Both);

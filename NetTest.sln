@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimplehostAnyListen", "Simp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleClientSelectHost", "SimpleClientSelectHost\SimpleClientSelectHost.csproj", "{C2FFC3E6-60DC-47A2-B7BE-7DE48DCBA678}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatClientSelectHost", "ChatClientSelectHost\ChatClientSelectHost.csproj", "{CB212133-C912-4781-81FB-199CA5069980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatClientSelectHost", "ChatClientSelectHost\ChatClientSelectHost.csproj", "{CB212133-C912-4781-81FB-199CA5069980}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatHostAnyListen", "ChatHostAnyListen\ChatHostAnyListen.csproj", "{2D530F2B-6249-4518-BEE7-02814A2092E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +99,18 @@ Global
 		{CB212133-C912-4781-81FB-199CA5069980}.Release|x64.Build.0 = Release|Any CPU
 		{CB212133-C912-4781-81FB-199CA5069980}.Release|x86.ActiveCfg = Release|Any CPU
 		{CB212133-C912-4781-81FB-199CA5069980}.Release|x86.Build.0 = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|x64.Build.0 = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Debug|x86.Build.0 = Debug|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|x64.ActiveCfg = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|x64.Build.0 = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|x86.ActiveCfg = Release|Any CPU
+		{2D530F2B-6249-4518-BEE7-02814A2092E6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
