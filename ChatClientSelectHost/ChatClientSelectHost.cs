@@ -7,6 +7,8 @@ namespace ChatClientSelectHost
 {
     class ChatClientSelectHost
     {
+        const string eof = "<EOF>";
+
         public static void Main()
         {
             Console.WriteLine("[ChatClientSelectHost]");
@@ -44,7 +46,7 @@ namespace ChatClientSelectHost
             Console.Write("Client：");
             string inputSt = Console.ReadLine();
             //Sendで送信している。
-            byte[] msg = Encoding.UTF8.GetBytes(inputSt + "<EOF>");
+            byte[] msg = Encoding.UTF8.GetBytes(inputSt +eof);
             socket.Send(msg);
 
             //Receiveで受信している。

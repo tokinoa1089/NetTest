@@ -8,6 +8,8 @@ namespace ChatHostAnyListen
 
     class S
     {
+        const string eof = "<EOF>";
+
         public static void Main()
         {
             Console.WriteLine("ChatHost Any listen");
@@ -19,8 +21,10 @@ namespace ChatHostAnyListen
         {
             //ここからIPアドレスやポートの設定
             // 着信データ用のデータバッファー。
-            byte[] bytes = new byte[1024];
+            byte[] bytes = new byte[10];
             string hostName = Dns.GetHostName();
+
+
             Console.WriteLine($"this hostName is {hostName}.");
             IPHostEntry ipHostInfo = Dns.GetHostEntry(hostName);
 
@@ -44,30 +48,36 @@ namespace ChatHostAnyListen
 
             // 任意の処理
             //データの受取をReceiveで行う。
-            int bytesRec;
-            try {
-                bytesRec = handler.Receive(bytes);
-            }
-            catch (SocketException e)
+            while (true)
             {
-                Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
-                return;
+                int bytesRec;
+                try
+                {
+                    bytesRec = handler.Receive(bytes);
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine("{0} Error code: {1}.", e.Message, e.ErrorCode);
+                    return;
+                }
+                if (bytesRec == 0)
+                {
+                    Console.WriteLine("異常なデータ受信（0バイト）");
+                    handler.Shutdown(SocketShutdown.Both);
+                    handler.Close();
+                    return;
+                }
+                string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
+                Console.WriteLine($"Client:{data1}");
+                if (data1.Contains(eof))
+                {
+                    break;
+                }
             }
-            if (bytesRec == 0)
-            {
-                Console.WriteLine("異常なデータ受信（0バイト）");
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-                return;
-            }
-
-            string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
-            Console.WriteLine($"Client:{data1}");
-
             //文字列を入力
             Console.Write("Host：");
             string inputSt = Console.ReadLine();
-            byte[] msg = Encoding.UTF8.GetBytes(inputSt + "<EOF>");
+            byte[] msg = Encoding.UTF8.GetBytes(inputSt + eof);
             //クライアントにSendで返す。
             handler.Send(msg);
 
