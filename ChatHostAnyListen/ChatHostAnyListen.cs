@@ -48,6 +48,7 @@ namespace ChatHostAnyListen
 
             // 任意の処理
             //データの受取をReceiveで行う。
+            string gotEof = "";
             while (true)
             {
                 int bytesRec;
@@ -69,7 +70,42 @@ namespace ChatHostAnyListen
                 }
                 string data1 = Encoding.UTF8.GetString(bytes, 0, bytesRec);
                 Console.WriteLine($"Client:{data1}");
-                if (data1.Contains(eof))
+                var i = 0;
+                int data1Id = 0;
+                do
+                {
+                    i = data1.Substring(data1Id, data1.Length - data1Id).IndexOf(eof.Substring(gotEof.Length, 1));
+                    if (i != -1)
+                    {   //文字が見つかった
+                        gotEof += data1.Substring(data1Id+i, 1);
+                        data1Id += i;
+                        if (gotEof == eof)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {   //文字が見つからない
+                        if (data1Id == 0)
+                        {   //全体で見つかっていない
+                            break;
+                        }
+                        else if (gotEof.Length!=0)
+                        {   //EOFが半端に見つかっている
+                            if (data1Id == data1.Length - 1)
+                            {   //最後に見たのが受信文字列の最後
+                                break;
+                            }
+                            else
+                            {
+                                gotEof = "";
+                            }
+                        }
+                    }
+                }
+                while (true);
+
+                if (gotEof.Contains(eof))
                 {
                     break;
                 }
