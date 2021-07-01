@@ -21,18 +21,16 @@ namespace ChatSystem
         {
             get => _connectMode;
         }
+
+        private IPAddress _ipAddress;
+        private Int32 _portNo;
+        private IPEndPoint _localEndPoint;
+        private Socket _connectSocet;
+        private Socket _chatSocket;
+
         public ChatSystem()
         {
             _hostName = Dns.GetHostName();
-        }
-        private IPAddress _ipAddress;
-        private Int32 _portNo;
-
-        private IPEndPoint _localEndPoint;
-
-        public void SetConnectMode(ConnectMode connectMode)
-        {
-            _connectMode = connectMode;
         }
 
         public void InitializeHost(IPAddress ipAddress,Int32 portNo )
@@ -40,36 +38,37 @@ namespace ChatSystem
             _connectMode = ConnectMode.host;
             _ipAddress = ipAddress;
             _portNo = portNo;
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, portNo);
-            //ソケットの作成
-            Socket listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+             _localEndPoint = new IPEndPoint(ipAddress, portNo);
+            //接続のためのソケットを作成
+            _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //通信の受け入れ準備
-            listener.Bind(localEndPoint);
-            listener.Listen(10);
+            _connectSocet.Bind(_localEndPoint);
+            _connectSocet.Listen(10);
             //通信の確立
-            Socket handler = listener.Accept();
+            _chatSocket = _connectSocet.Accept();
         }
-        public bool InitializeClient(IPAddress ipAddress, Int32 portNo)
+        public bool InitializeClient(IPAddress ipAddress, Int32 portNo,out Exception e)
         {
+            e = null;
             _connectMode = ConnectMode.client;
             _ipAddress = ipAddress;
             _portNo = portNo;
-            IPEndPoint remoteEP = new IPEndPoint(ipAddress, portNo);
+            _localEndPoint = new IPEndPoint(ipAddress, portNo);
             //ソケットを作成
-            Socket socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //接続する。失敗するとエラーで落ちる。
             try
             {
-                socket.Connect(remoteEP);
+                _connectSocet.Connect(_localEndPoint);
             }
-            catch (Exception e)
+            catch (Exception err)
             {
-                Console.WriteLine($"Connect Faild{e.ToString()}");
+                e = err;
                 return false;
             }
+            _chatSocket = _connectSocet;
             return true;
         }
-
     }
 
 }

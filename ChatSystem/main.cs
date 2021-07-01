@@ -15,13 +15,12 @@ namespace ChatSystem
             chatSystem = new ChatSystem();
             Console.WriteLine($"this hostName is {chatSystem.hostName}.");
             ChatSystem.ConnectMode connectMode= SelectMode();
-            chatSystem.SetConnectMode(connectMode);
 
         }
         static ChatSystem.ConnectMode  SelectMode()
         {
             ChatSystem.ConnectMode connectMode= ChatSystem.ConnectMode.host;
-            Console.Write("Select Mode:\n0=Host,1=Client");
+            Console.Write("Select Mode: 0=Host,1=Client\n");
             int select = int.Parse(Console.ReadLine());
             switch (select)
             {
@@ -56,7 +55,8 @@ namespace ChatSystem
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            bool suceed =chatSystem.InitializeClient(ipAddress, 11000);
+            Exception e;
+            bool suceed =chatSystem.InitializeClient(ipAddress, 11000,out e);
             if (suceed)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
@@ -64,6 +64,7 @@ namespace ChatSystem
             else
             {
                 Console.WriteLine("faled to connect to host");
+
             }
         }
     }
