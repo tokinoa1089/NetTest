@@ -55,16 +55,14 @@ namespace ChatSystem
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            Exception e;
-            bool suceed =chatSystem.InitializeClient(ipAddress, 11000,out e);
-            if (suceed)
+            (bool sucess, Exception e) =chatSystem.InitializeClient(ipAddress, 11000);
+            if (sucess)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
             }
             else
             {
-                Console.WriteLine("faled to connect to host");
-
+                Console.WriteLine($"faled to connect to host,ERROR={e.ToString()}");
             }
         }
     }

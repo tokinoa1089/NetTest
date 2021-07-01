@@ -32,7 +32,11 @@ namespace ChatSystem
         {
             _hostName = Dns.GetHostName();
         }
-
+        /// <summary>
+        /// Initialize as a Host
+        /// </summary>
+        /// <param name="ipAddress">ip Addressa</param>
+        /// <param name="portNo"> port No</param>
         public void InitializeHost(IPAddress ipAddress,Int32 portNo )
         {
             _connectMode = ConnectMode.host;
@@ -47,9 +51,15 @@ namespace ChatSystem
             //通信の確立
             _chatSocket = _connectSocet.Accept();
         }
-        public bool InitializeClient(IPAddress ipAddress, Int32 portNo,out Exception e)
+        /// <summary>
+        /// Initialize as a Client
+        /// </summary>
+        /// <param name="ipAddress">ipAddress</param>
+        /// <param name="portNo">portNo</param>
+        /// <param name="e">Exception</param>
+        /// <returns>bool result</returns>
+        public (bool sucess,Exception e) InitializeClient(IPAddress ipAddress, Int32 portNo)
         {
-            e = null;
             _connectMode = ConnectMode.client;
             _ipAddress = ipAddress;
             _portNo = portNo;
@@ -63,12 +73,13 @@ namespace ChatSystem
             }
             catch (Exception err)
             {
-                e = err;
-                return false;
+               
+                return( false,err);
             }
             _chatSocket = _connectSocet;
-            return true;
+            return (true, null);
         }
+        
     }
 
 }
