@@ -9,10 +9,11 @@ namespace ChatSystem
     {
         static ChatSystem chatSystem;
         const Int32 portNo = 11000;
+        const int maxLength = 200;
 
         static void Main(string[] args)
         {
-            chatSystem = new ChatSystem();
+            chatSystem = new ChatSystem(maxLength);
             Console.WriteLine($"this hostName is {chatSystem.hostName}.");
             ChatSystem.ConnectMode connectMode= SelectMode();
 
@@ -49,7 +50,11 @@ namespace ChatSystem
             }
             Console.Write($"Select address to listen(0 - {ipHostInfo.AddressList.Length - 1}):");
             IPAddress ipAddress = ipHostInfo.AddressList[int.Parse(Console.ReadLine())];
-            chatSystem.InitializeHost(ipAddress, portNo);
+            (bool sucess, Exception e) = chatSystem.InitializeHost(ipAddress, portNo);
+            if (!sucess)
+            {
+                Console.WriteLine($"faled to initialize,ERROR={e.ToString()}");
+            }
         }
         static void InitializeClient()
         {

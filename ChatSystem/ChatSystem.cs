@@ -25,11 +25,13 @@ namespace ChatSystem
         private IPAddress _ipAddress;
         private Int32 _portNo;
         private IPEndPoint _localEndPoint;
-        private Socket _connectSocet;
-        private Socket _chatSocket;
+        private Socket _connectSocet = null;
+        private Socket _chatSocket=null;
+        private int _maxChatLength;
 
-        public ChatSystem()
+        public ChatSystem(int maxChatLength)
         {
+            _maxChatLength = maxChatLength;
             _hostName = Dns.GetHostName();
         }
         /// <summary>
@@ -37,7 +39,7 @@ namespace ChatSystem
         /// </summary>
         /// <param name="ipAddress">ip Addressa</param>
         /// <param name="portNo"> port No</param>
-        public void InitializeHost(IPAddress ipAddress,Int32 portNo )
+        public (bool sucess, Exception e) InitializeHost(IPAddress ipAddress,Int32 portNo )
         {
             _connectMode = ConnectMode.host;
             _ipAddress = ipAddress;
@@ -46,10 +48,32 @@ namespace ChatSystem
             //接続のためのソケットを作成
             _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //通信の受け入れ準備
-            _connectSocet.Bind(_localEndPoint);
-            _connectSocet.Listen(10);
+            try
+            {
+                _connectSocet.Bind(_localEndPoint);
+            }
+            catch (Exception e)
+            {
+                return (false, e);
+            }
+            try
+            {
+                _connectSocet.Listen(10);
+            }
+            catch (Exception e)
+            {
+                return (false, e);
+            }
             //通信の確立
-            _chatSocket = _connectSocet.Accept();
+            try
+            {
+                _chatSocket = _connectSocet.Accept();
+            }
+            catch (Exception e)
+            {
+                return (false, e);
+            }
+            return (true, null);
         }
         /// <summary>
         /// Initialize as a Client
@@ -78,6 +102,22 @@ namespace ChatSystem
             }
             _chatSocket = _connectSocet;
             return (true, null);
+        }
+        /// <summary>
+        /// Receive connected Socket
+        /// </summary>
+        /// <returns>Suceed ,received string or ErrorMessage</returns>
+        public (bool sucess,string s) Receive()
+        {
+            if (_chatSocket != null)
+            {
+               // ここに受信処理が入る 
+                
+                
+                return (true, string.Empty);
+            }
+            return (false, "not Initialize");
+
         }
         
     }
