@@ -20,20 +20,20 @@ namespace ChatSystem
         }
         static ChatSystem.ConnectMode  SelectMode()
         {
-            ChatSystem.ConnectMode connectMode= ChatSystem.ConnectMode.host;
+            ChatSystem.ConnectMode connectMode = ChatSystem.ConnectMode.host;
             Console.Write("Select Mode: 0=Host,1=Client\n");
             int select = int.Parse(Console.ReadLine());
             switch (select)
             {
                 case 0: //Host
-                    connectMode = ChatSystem.ConnectMode.host;
                     Console.WriteLine("Running Host mode");
                     InitializeHost();
+                    connectMode = ChatSystem.ConnectMode.host;
                     break;
                 case 1: //Client
-                    connectMode = ChatSystem.ConnectMode.client;
                     Console.WriteLine("Running Client mode");
                     InitializeClient();
+                    connectMode = ChatSystem.ConnectMode.client;
                     break;
                 default:
                     Console.WriteLine("ERROR undefind");
