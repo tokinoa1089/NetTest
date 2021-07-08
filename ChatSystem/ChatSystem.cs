@@ -26,7 +26,7 @@ namespace ChatSystem
         private Int32 _portNo;
         private IPEndPoint _localEndPoint;
         private Socket _connectSocet = null;
-        private Socket _chatSocket=null;
+        private Socket _chatSocket = null;
         private int _maxChatLength;
 
         public ChatSystem(int maxChatLength)
@@ -39,12 +39,12 @@ namespace ChatSystem
         /// </summary>
         /// <param name="ipAddress">ip Addressa</param>
         /// <param name="portNo"> port No</param>
-        public (bool sucess, Exception e) InitializeHost(IPAddress ipAddress,Int32 portNo )
+        public (bool sucess, Exception e) InitializeHost(IPAddress ipAddress, Int32 portNo)
         {
             _connectMode = ConnectMode.host;
             _ipAddress = ipAddress;
             _portNo = portNo;
-             _localEndPoint = new IPEndPoint(ipAddress, portNo);
+            _localEndPoint = new IPEndPoint(ipAddress, portNo);
             //接続のためのソケットを作成
             _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //通信の受け入れ準備
@@ -82,7 +82,7 @@ namespace ChatSystem
         /// <param name="portNo">portNo</param>
         /// <param name="e">Exception</param>
         /// <returns>bool result</returns>
-        public (bool sucess,Exception e) InitializeClient(IPAddress ipAddress, Int32 portNo)
+        public (bool sucess, Exception e) InitializeClient(IPAddress ipAddress, Int32 portNo)
         {
             _connectMode = ConnectMode.client;
             _ipAddress = ipAddress;
@@ -97,8 +97,8 @@ namespace ChatSystem
             }
             catch (Exception err)
             {
-               
-                return( false,err);
+
+                return (false, err);
             }
             _chatSocket = _connectSocet;
             return (true, null);
@@ -107,7 +107,7 @@ namespace ChatSystem
         /// Receive connected Socket
         /// </summary>
         /// <returns>Suceed ,received string or ErrorMessage</returns>
-        public (bool sucess, SocketException e,string buffrer) Receive( int bufferSize)
+        public (bool sucess, SocketException e, string buffrer) Receive(int bufferSize)
         {
             byte[] bytes = new byte[bufferSize];
             if (_chatSocket != null)
@@ -119,7 +119,9 @@ namespace ChatSystem
                 }
                 catch (SocketException e)
                 {
-                    return(false, e,null);
+                    _chatSocket = null;
+                    _connectSocet = null;
+                    return (false, e, null);
                 }
                 // 正常に受信
                 string receivedString = Encoding.UTF8.GetString(bytes, 0, bytesRec);
@@ -136,8 +138,10 @@ namespace ChatSystem
             {
                 _chatSocket.Send(msg);
             }
-            catch(SocketException e)
+            catch (SocketException e)
             {   //ソケットへのアクセスを試行しているときにエラーが発生しました。
+                _chatSocket = null;
+                _connectSocet = null;
                 return (false, e);
             }
             return (true, null);
@@ -146,12 +150,14 @@ namespace ChatSystem
 
         public void ShutDownColse()
         {
-            _connectSocet.Shutdown(SocketShutdown.Both);
-            _connectSocet.Close();
-            _connectSocet = null;
+            if (_connectSocet != null)
+            {
+                _connectSocet.Shutdown(SocketShutdown.Both);
+                _connectSocet.Close();
+                _connectSocet = null;
+            }
             return;
         }
-        
     }
 
 }
