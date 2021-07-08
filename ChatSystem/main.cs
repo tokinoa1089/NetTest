@@ -10,15 +10,18 @@ namespace ChatSystem
         static ChatSystem chatSystem;
         const Int32 portNo = 11000;
         const int maxLength = 200;
+        static ChatSystem.ConnectMode connectMode;
+        static string buffer = null;
 
         static void Main(string[] args)
         {
             chatSystem = new ChatSystem(maxLength);
             Console.WriteLine($"this hostName is {chatSystem.hostName}.");
-            ChatSystem.ConnectMode connectMode= SelectMode();
+            connectMode = SelectMode();
+            InChat();
 
         }
-        static ChatSystem.ConnectMode  SelectMode()
+        static ChatSystem.ConnectMode SelectMode()
         {
             ChatSystem.ConnectMode connectMode = ChatSystem.ConnectMode.host;
             Console.Write("Select Mode: 0=Host,1=Client\n");
@@ -60,7 +63,7 @@ namespace ChatSystem
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            (bool sucess, Exception e) =chatSystem.InitializeClient(ipAddress, 11000);
+            (bool sucess, Exception e) = chatSystem.InitializeClient(ipAddress, 11000);
             if (sucess)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
@@ -69,6 +72,49 @@ namespace ChatSystem
             {
                 Console.WriteLine($"faled to connect to host,ERROR={e.ToString()}");
             }
+        }
+        static void InChat()
+        {
+            bool turn = (connectMode == ChatSystem.ConnectMode.host);
+            while (true)
+            {
+                if (turn)
+                {   // 受信
+                    (bool sucess, SocketException e, string s) = chatSystem.Receive(maxLength);
+                    if (sucess)
+                    {
+                        if (s.Length != 0)
+                        {   // 正常にメッセージを受信
+                            Console.WriteLine($"受信メッセージ：{s}");
+                        }
+                        else
+                        {   // 正常に終了を受信
+                            Console.WriteLine("相手から終了を受信");
+                            break;
+                        }
+                    }
+                    else
+                    {   //　受信エラー
+                        Console.WriteLine($"受信エラー：{e.Message} Error code: {e.ErrorCode}.");
+                        break;
+                    }
+                }
+                else
+                {   // 送信
+                    Console.Write("送るメッセージ：");
+                    string inputSt = Console.ReadLine();
+                    //Sendで送信
+                    byte[] msg = Encoding.UTF8.GetBytes(inputSt);
+                    (bool sucess, SocketException e) = chatSystem.Send(msg);
+                    if (!sucess)
+                    {
+                        Console.WriteLine($"送信エラー：{e.Message} Error code: {e.ErrorCode}.");
+                        break;
+                    }
+                }
+                turn = !turn;
+            }
+            chatSystem.ShutDownColse();
         }
     }
 }

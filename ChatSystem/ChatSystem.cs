@@ -107,17 +107,48 @@ namespace ChatSystem
         /// Receive connected Socket
         /// </summary>
         /// <returns>Suceed ,received string or ErrorMessage</returns>
-        public (bool sucess,string s) Receive()
+        public (bool sucess, SocketException e,string buffrer) Receive( int bufferSize)
         {
+            byte[] bytes = new byte[bufferSize];
             if (_chatSocket != null)
-            {
-               // ここに受信処理が入る 
-                
-                
-                return (true, string.Empty);
+            {   // 初期化済み
+                int bytesRec;
+                try
+                {
+                    bytesRec = _chatSocket.Receive(bytes);
+                }
+                catch (SocketException e)
+                {
+                    return(false, e,null);
+                }
+                // 正常に受信
+                return (true, null, bytes.ToString());
             }
-            return (false, "not Initialize");
+            else
+            {
+                return (false, null, "not Initialize");
+            }
+        }
+        public (bool sucess, SocketException e) Send(byte[] msg)
+        {
+            try
+            {
+                _chatSocket.Send(msg);
+            }
+            catch(SocketException e)
+            {   //ソケットへのアクセスを試行しているときにエラーが発生しました。
+                return (false, e);
+            }
+            return (true, null);
 
+        }
+
+        public void ShutDownColse()
+        {
+            _connectSocet.Shutdown(SocketShutdown.Both);
+            _connectSocet.Close();
+            _connectSocet = null;
+            return;
         }
         
     }
