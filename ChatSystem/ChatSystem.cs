@@ -122,7 +122,8 @@ namespace ChatSystem
                     return(false, e,null);
                 }
                 // 正常に受信
-                return (true, null, bytes.ToString());
+                string receivedString = Encoding.UTF8.GetString(bytes, 0, bytesRec);
+                return (true, null, receivedString);
             }
             else
             {
