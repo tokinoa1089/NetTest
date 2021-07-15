@@ -29,6 +29,48 @@ namespace ChatSystem
         private Socket _chatSocket = null;
         private int _maxChatLength;
 
+        public struct Result
+        {
+            public enum eresult { success, exception, socketException,notInit };
+            //, argumentNullException, objectDisposedExceptionは除外
+            public eresult result;
+            public Exception exception;
+            public SocketException socketException;
+            public Result(eresult r = eresult.success, Exception e = null, SocketException se = null)
+            {
+                result = eresult.success;
+                exception = e;
+                socketException = se;
+            }
+            public override  string ToString()
+            {
+                string s = null;
+                switch (result)
+                {
+                    case eresult.exception:
+                        s = exception.ToString();
+                        break;
+                    case eresult.socketException:
+                        s = socketException.ToString();
+                        break;
+                    default:
+                        break;
+                }
+                return s;
+            }
+            public int ErrorCode
+            {
+                get
+                {
+                    if (result == eresult.socketException)
+                    {
+                        return socketException.ErrorCode;
+                    }
+                    return 0;
+                }
+            }
+        }
+
         public ChatSystem(int maxChatLength)
         {
             _maxChatLength = maxChatLength;
@@ -39,8 +81,9 @@ namespace ChatSystem
         /// </summary>
         /// <param name="ipAddress">ip Addressa</param>
         /// <param name="portNo"> port No</param>
-        public (bool sucess, Exception e) InitializeHost(IPAddress ipAddress, Int32 portNo)
+        public Result InitializeHost(IPAddress ipAddress, Int32 portNo)
         {
+            Result result = new Result(Result.eresult.success);
             _connectMode = ConnectMode.host;
             _ipAddress = ipAddress;
             _portNo = portNo;
@@ -54,7 +97,7 @@ namespace ChatSystem
             }
             catch (Exception e)
             {
-                return (false, e);
+                return new Result(Result.eresult.exception,e,null);
             }
             try
             {
@@ -62,7 +105,7 @@ namespace ChatSystem
             }
             catch (Exception e)
             {
-                return (false, e);
+                return new Result(Result.eresult.exception, e, null);
             }
             //通信の確立
             try
@@ -71,9 +114,9 @@ namespace ChatSystem
             }
             catch (Exception e)
             {
-                return (false, e);
+                return new Result(Result.eresult.exception, e, null);
             }
-            return (true, null);
+            return new Result(Result.eresult.success);
         }
         /// <summary>
         /// Initialize as a Client
@@ -82,7 +125,7 @@ namespace ChatSystem
         /// <param name="portNo">portNo</param>
         /// <param name="e">Exception</param>
         /// <returns>bool result</returns>
-        public (bool sucess, Exception e) InitializeClient(IPAddress ipAddress, Int32 portNo)
+        public Result InitializeClient(IPAddress ipAddress, Int32 portNo)
         {
             _connectMode = ConnectMode.client;
             _ipAddress = ipAddress;
@@ -95,19 +138,19 @@ namespace ChatSystem
             {
                 _connectSocet.Connect(_localEndPoint);
             }
-            catch (Exception err)
+            catch (Exception e)
             {
 
-                return (false, err);
+                return new Result(Result.eresult.exception, e, null);
             }
             _chatSocket = _connectSocet;
-            return (true, null);
+            return new Result(Result.eresult.success);
         }
         /// <summary>
         /// Receive connected Socket
         /// </summary>
         /// <returns>Suceed ,received string or ErrorMessage</returns>
-        public (bool sucess, SocketException e, string buffrer) Receive(int bufferSize)
+        public (Result re, string buffrer) Receive(int bufferSize)
         {
             byte[] bytes = new byte[bufferSize];
             if (_chatSocket != null)
@@ -121,18 +164,18 @@ namespace ChatSystem
                 {
                     _chatSocket = null;
                     _connectSocet = null;
-                    return (false, e, null);
+                    return (new Result(Result.eresult.socketException,null,e), null);
                 }
                 // 正常に受信
                 string receivedString = Encoding.UTF8.GetString(bytes, 0, bytesRec);
-                return (true, null, receivedString);
+                return (new Result(Result.eresult.success), receivedString);
             }
             else
             {
-                return (false, null, "not Initialize");
+                return (new Result(Result.eresult.notInit),null);
             }
         }
-        public (bool sucess, SocketException e) Send(byte[] msg)
+        public Result Send(byte[] msg)
         {
             try
             {
@@ -142,10 +185,17 @@ namespace ChatSystem
             {   //ソケットへのアクセスを試行しているときにエラーが発生しました。
                 _chatSocket = null;
                 _connectSocet = null;
-                return (false, e);
+                return new Result(Result.eresult.socketException,null,e);
             }
-            return (true, null);
-
+            catch (ArgumentNullException e)
+            {
+                throw;
+            }
+            catch (ObjectDisposedException e)
+            {
+                throw;
+            }
+            return new Result(Result.eresult.success);
         }
 
         public void ShutDownColse()

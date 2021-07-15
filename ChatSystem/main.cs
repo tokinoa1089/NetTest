@@ -53,24 +53,24 @@ namespace ChatSystem
             }
             Console.Write($"Select address to listen(0 - {ipHostInfo.AddressList.Length - 1}):");
             IPAddress ipAddress = ipHostInfo.AddressList[int.Parse(Console.ReadLine())];
-            (bool sucess, Exception e) = chatSystem.InitializeHost(ipAddress, portNo);
-            if (!sucess)
+            ChatSystem.Result re = chatSystem.InitializeHost(ipAddress, portNo);
+            if (re.result!=ChatSystem.Result.eresult.success)
             {
-                Console.WriteLine($"faled to initialize,ERROR={e.ToString()}");
+                Console.WriteLine($"faled to initialize,ERROR={re.ToString()}");
             }
         }
         static void InitializeClient()
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            (bool sucess, Exception e) = chatSystem.InitializeClient(ipAddress, 11000);
-            if (sucess)
+            ChatSystem.Result re = chatSystem.InitializeClient(ipAddress, 11000);
+            if (re.result == ChatSystem.Result.eresult.success)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
             }
             else
             {
-                Console.WriteLine($"faled to connect to host,ERROR={e.ToString()}");
+                Console.WriteLine($"faled to connect to host,ERROR={re.ToString()}");
             }
         }
         static void InChat()
@@ -80,8 +80,8 @@ namespace ChatSystem
             {
                 if (turn)
                 {   // 受信
-                    (bool sucess, SocketException e, string s) = chatSystem.Receive(maxLength);
-                    if (sucess)
+                    (ChatSystem.Result re, string s) = chatSystem.Receive(maxLength);
+                    if (re.result == ChatSystem.Result.eresult.success)
                     {
                         if (s.Length != 0)
                         {   // 正常にメッセージを受信
@@ -95,7 +95,7 @@ namespace ChatSystem
                     }
                     else
                     {   //　受信エラー
-                        Console.WriteLine($"受信エラー：{e.Message} Error code: {e.ErrorCode}.");
+                        Console.WriteLine($"受信エラー：{re.ToString()} Error code: {re.ErrorCode}.");
                         break;
                     }
                 }
@@ -105,10 +105,10 @@ namespace ChatSystem
                     string inputSt = Console.ReadLine();
                     //Sendで送信
                     byte[] msg = Encoding.UTF8.GetBytes(inputSt);
-                    (bool sucess, SocketException e) = chatSystem.Send(msg);
-                    if (!sucess)
+                    ChatSystem.Result re = chatSystem.Send(msg);
+                    if (re.result!=ChatSystem.Result.eresult.success)
                     {
-                        Console.WriteLine($"送信エラー：{e.Message} Error code: {e.ErrorCode}.");
+                        Console.WriteLine($"送信エラー：{re.ToString()} Error code: {re.ErrorCode}.");
                         break;
                     }
                 }
