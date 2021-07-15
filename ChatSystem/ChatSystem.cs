@@ -187,6 +187,7 @@ namespace ChatSystem
                 _connectSocet = null;
                 return new Result(Result.eresult.socketException,null,e);
             }
+            /*
             catch (ArgumentNullException e)
             {
                 throw;
@@ -195,6 +196,7 @@ namespace ChatSystem
             {
                 throw;
             }
+            */
             return new Result(Result.eresult.success);
         }
 
