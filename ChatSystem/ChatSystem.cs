@@ -29,49 +29,53 @@ namespace ChatSystem
         private Socket _chatSocket = null;
         private int _maxChatLength;
 
-        public struct Result
+        // termination of processes
+        public enum EResult { success, exception, socketException, argumentOutOfRangeException, notInit };
+        EResult eResult = EResult.success;
+        public Exception exception;
+        public SocketException socketException;
+        public ArgumentOutOfRangeException argumentOutOfRangeException;
+        public string resultMessage
         {
-            public enum eresult { success, exception, socketException,notInit };
-            //, argumentNullException, objectDisposedExceptionは除外
-            public eresult result;
-            public Exception exception;
-            public SocketException socketException;
-            public Result(eresult r = eresult.success, Exception e = null, SocketException se = null)
-            {
-                result = eresult.success;
-                exception = e;
-                socketException = se;
-            }
-            public override  string ToString()
-            {
+            get {
                 string s = null;
-                switch (result)
-                {
-                    case eresult.exception:
-                        s = exception.ToString();
+                switch (eResult) {
+                    case EResult.success:
+                        s = "success";
                         break;
-                    case eresult.socketException:
-                        s = socketException.ToString();
+                    case EResult.exception:
+                        s = "Exception:" + exception.Message;
+                        break;
+                    case EResult.socketException:
+                        s = "SocketException" + socketException.Message;
+                        break;
+                    case EResult.argumentOutOfRangeException:
+                        s = "ArgumentOutOfRangeException:" + argumentOutOfRangeException.Message;
+                        break;
+                    case EResult.notInit:
+                        s = "Not Initialized";
                         break;
                     default:
                         break;
                 }
                 return s;
             }
-            public int ErrorCode
+        }
+        public class Buffer
+        {
+            public int length;
+            public int capacity;
+            public byte[] content;
+            public Buffer(int c)
             {
-                get
-                {
-                    if (result == eresult.socketException)
-                    {
-                        return socketException.ErrorCode;
-                    }
-                    return 0;
-                }
+                capacity = c;
+                content = new byte[capacity];
+                length = 0;
             }
         }
 
-        public ChatSystem(int maxChatLength)
+
+        public ChatSystem(int maxChatLength = 0)
         {
             _maxChatLength = maxChatLength;
             _hostName = Dns.GetHostName();
@@ -81,9 +85,8 @@ namespace ChatSystem
         /// </summary>
         /// <param name="ipAddress">ip Addressa</param>
         /// <param name="portNo"> port No</param>
-        public Result InitializeHost(IPAddress ipAddress, Int32 portNo)
+        public EResult InitializeHost(IPAddress ipAddress, Int32 portNo)
         {
-            Result result = new Result(Result.eresult.success);
             _connectMode = ConnectMode.host;
             _ipAddress = ipAddress;
             _portNo = portNo;
@@ -91,32 +94,29 @@ namespace ChatSystem
             //接続のためのソケットを作成
             _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //通信の受け入れ準備
-            try
-            {
+            try {
                 _connectSocet.Bind(_localEndPoint);
             }
-            catch (Exception e)
-            {
-                return new Result(Result.eresult.exception,e,null);
+            catch (Exception e) {
+                exception = e;
+                return EResult.exception;
             }
-            try
-            {
+            try {
                 _connectSocet.Listen(10);
             }
-            catch (Exception e)
-            {
-                return new Result(Result.eresult.exception, e, null);
+            catch (Exception e) {
+                exception = e;
+                return EResult.exception;
             }
             //通信の確立
-            try
-            {
+            try {
                 _chatSocket = _connectSocet.Accept();
             }
-            catch (Exception e)
-            {
-                return new Result(Result.eresult.exception, e, null);
+            catch (Exception e) {
+                exception = e;
+                return EResult.exception;
             }
-            return new Result(Result.eresult.success);
+            return EResult.success;
         }
         /// <summary>
         /// Initialize as a Client
@@ -125,7 +125,7 @@ namespace ChatSystem
         /// <param name="portNo">portNo</param>
         /// <param name="e">Exception</param>
         /// <returns>bool result</returns>
-        public Result InitializeClient(IPAddress ipAddress, Int32 portNo)
+        public EResult InitializeClient(IPAddress ipAddress, Int32 portNo)
         {
             _connectMode = ConnectMode.client;
             _ipAddress = ipAddress;
@@ -134,58 +134,55 @@ namespace ChatSystem
             //ソケットを作成
             _connectSocet = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //接続する。失敗するとエラーで落ちる。
-            try
-            {
+            try {
                 _connectSocet.Connect(_localEndPoint);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
 
-                return new Result(Result.eresult.exception, e, null);
+                exception = e;
+                return EResult.exception;
             }
             _chatSocket = _connectSocet;
-            return new Result(Result.eresult.success);
+            return EResult.success;
         }
         /// <summary>
         /// Receive connected Socket
         /// </summary>
         /// <returns>Suceed ,received string or ErrorMessage</returns>
-        public (Result re, string buffrer) Receive(int bufferSize)
+        public EResult  Receive(Buffer buffer)
         {
-            byte[] bytes = new byte[bufferSize];
-            if (_chatSocket != null)
-            {   // 初期化済み
+              if (_chatSocket != null) {   // 初期化済み
                 int bytesRec;
-                try
-                {
-                    bytesRec = _chatSocket.Receive(bytes);
+                try {
+                    bytesRec = _chatSocket.Receive(buffer.content,buffer.capacity,SocketFlags.None);
                 }
-                catch (SocketException e)
-                {
+                catch (SocketException e) {
                     _chatSocket = null;
                     _connectSocet = null;
-                    return (new Result(Result.eresult.socketException,null,e), null);
+                    socketException = e;
+                    return EResult.socketException;
+                }
+                catch(ArgumentOutOfRangeException e) {
+                    argumentOutOfRangeException = e;
+                    return EResult.argumentOutOfRangeException;
                 }
                 // 正常に受信
-                string receivedString = Encoding.UTF8.GetString(bytes, 0, bytesRec);
-                return (new Result(Result.eresult.success), receivedString);
+                return EResult.success;
             }
-            else
-            {
-                return (new Result(Result.eresult.notInit),null);
+            else {
+                return EResult.notInit;
             }
         }
-        public Result Send(byte[] msg)
+        public EResult Send(Buffer buffer)
         {
-            try
-            {
-                _chatSocket.Send(msg);
+            try {
+                _chatSocket.Send(buffer.content,buffer.length,SocketFlags.None);
             }
-            catch (SocketException e)
-            {   //ソケットへのアクセスを試行しているときにエラーが発生しました。
+            catch (SocketException e) {   //ソケットへのアクセスを試行しているときにエラーが発生しました。
                 _chatSocket = null;
                 _connectSocet = null;
-                return new Result(Result.eresult.socketException,null,e);
+                socketException = e;
+                return EResult.socketException;
             }
             /*
             catch (ArgumentNullException e)
@@ -197,14 +194,18 @@ namespace ChatSystem
                 throw;
             }
             */
-            return new Result(Result.eresult.success);
+            return EResult.success;
         }
 
         public void ShutDownColse()
         {
-            if (_connectSocet != null)
-            {
-                _connectSocet.Shutdown(SocketShutdown.Both);
+            if (_connectSocet != null) {
+                try {
+                    _connectSocet.Shutdown(SocketShutdown.Both);
+                }
+                catch (SocketException) {
+
+                }
                 _connectSocet.Close();
                 _connectSocet = null;
             }

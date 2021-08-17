@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using ChatSystem;
 
 namespace ChatSystem
 {
@@ -9,9 +10,9 @@ namespace ChatSystem
     {
         static ChatSystem chatSystem;
         const Int32 portNo = 11000;
-        const int maxLength = 200;
+        const string EOF = "<EOF>";
+        static readonly int maxLength = 200+EOF.Length;
         static ChatSystem.ConnectMode connectMode;
-        static string buffer = null;
 
         static void Main(string[] args)
         {
@@ -53,8 +54,8 @@ namespace ChatSystem
             }
             Console.Write($"Select address to listen(0 - {ipHostInfo.AddressList.Length - 1}):");
             IPAddress ipAddress = ipHostInfo.AddressList[int.Parse(Console.ReadLine())];
-            ChatSystem.Result re = chatSystem.InitializeHost(ipAddress, portNo);
-            if (re.result!=ChatSystem.Result.eresult.success)
+            ChatSystem.EResult re = chatSystem.InitializeHost(ipAddress, portNo);
+            if (re!=ChatSystem.EResult.success)
             {
                 Console.WriteLine($"faled to initialize,ERROR={re.ToString()}");
             }
@@ -63,29 +64,33 @@ namespace ChatSystem
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            ChatSystem.Result re = chatSystem.InitializeClient(ipAddress, 11000);
-            if (re.result == ChatSystem.Result.eresult.success)
+            ChatSystem.EResult re = chatSystem.InitializeClient(ipAddress, 11000);
+            if (re == ChatSystem.EResult.success)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
             }
             else
             {
-                Console.WriteLine($"faled to connect to host,ERROR={re.ToString()}");
+                Console.WriteLine($"faled to connect to host,ERROR={chatSystem.resultMessage}");
             }
         }
         static void InChat()
         {
+            ChatSystem.Buffer buffer = new ChatSystem.Buffer(maxLength);
             bool turn = (connectMode == ChatSystem.ConnectMode.host);
             while (true)
             {
                 if (turn)
                 {   // 受信
-                    (ChatSystem.Result re, string s) = chatSystem.Receive(maxLength);
-                    if (re.result == ChatSystem.Result.eresult.success)
+                    buffer = new ChatSystem.Buffer(maxLength);
+                    ChatSystem.EResult re = chatSystem.Receive(buffer);
+                    if (re == ChatSystem.EResult.success)
                     {
-                        if (s.Length != 0)
+                        string received = Encoding.UTF8.GetString(buffer.content).Replace(EOF,"");
+                        int l = received.Length;
+                        if ( received[0]!='\0')
                         {   // 正常にメッセージを受信
-                            Console.WriteLine($"受信メッセージ：{s}");
+                            Console.WriteLine($"受信メッセージ：{received}");
                         }
                         else
                         {   // 正常に終了を受信
@@ -95,7 +100,7 @@ namespace ChatSystem
                     }
                     else
                     {   //　受信エラー
-                        Console.WriteLine($"受信エラー：{re.ToString()} Error code: {re.ErrorCode}.");
+                        Console.WriteLine($"受信エラー：{chatSystem.resultMessage} ");
                         break;
                     }
                 }
@@ -103,12 +108,16 @@ namespace ChatSystem
                 {   // 送信
                     Console.Write("送るメッセージ：");
                     string inputSt = Console.ReadLine();
-                    //Sendで送信
-                    byte[] msg = Encoding.UTF8.GetBytes(inputSt);
-                    ChatSystem.Result re = chatSystem.Send(msg);
-                    if (re.result!=ChatSystem.Result.eresult.success)
+                    if (inputSt.Length > maxLength) {
+                        inputSt = inputSt.Substring(0, maxLength - EOF.Length);
+                    }
+                    inputSt += EOF;
+                    buffer.content = Encoding.UTF8.GetBytes(inputSt);
+                    buffer.length = buffer.content.Length;
+                    ChatSystem.EResult re = chatSystem.Send(buffer);
+                    if (re!=ChatSystem.EResult.success)
                     {
-                        Console.WriteLine($"送信エラー：{re.ToString()} Error code: {re.ErrorCode}.");
+                        Console.WriteLine($"送信エラー：{re.ToString()} Error code: {chatSystem.resultMessage}");
                         break;
                     }
                 }
