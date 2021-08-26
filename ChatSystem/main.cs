@@ -64,7 +64,7 @@ namespace ChatSystem
         {
             Console.Write("Input IP address to connect:");
             var ipAddress = IPAddress.Parse(Console.ReadLine());
-            ChatSystem.EResult re = chatSystem.InitializeClient(ipAddress, 11000);
+            ChatSystem.EResult re = chatSystem.InitializeClient(ipAddress, portNo);
             if (re == ChatSystem.EResult.success)
             {
                 Console.WriteLine($"Connected host {ipAddress.ToString()}");
