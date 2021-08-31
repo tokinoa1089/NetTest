@@ -30,6 +30,9 @@ namespace ChatSystem
                 case FunctionMode.bot:
                     InChatBot();
                     break;
+                case FunctionMode.janken:
+                    Injanken();
+                    break;
                 default:
                     Console.WriteLine("not suported");
                     break;
@@ -225,6 +228,161 @@ namespace ChatSystem
                     {
                         inputSt = inputSt.Substring(0, maxLength - EOF.Length);
                     }
+                    inputSt += EOF;
+                    buffer.content = Encoding.UTF8.GetBytes(inputSt);
+                    buffer.length = buffer.content.Length;
+                    ChatSystem.EResult re = chatSystem.Send(buffer);
+                    if (re != ChatSystem.EResult.success)
+                    {
+                        Console.WriteLine($"送信エラー：{re.ToString()} Error code: {chatSystem.resultMessage}");
+                        break;
+                    }
+                }
+                turn = !turn;
+            }
+            chatSystem.ShutDownColse();
+        }
+        static string Hand()
+        {
+            bool turn = (connectMode == ChatSystem.ConnectMode.host);
+            string select = "";
+            while (true)
+            {
+                Console.WriteLine("What to put out ?[0:グー、1:チョキ、2:パー、それ以外:終了]");
+                if (turn)
+                {
+                    Random te = new Random();
+                    select = te.Next(0, 3).ToString();
+                    Console.WriteLine(select);
+                }
+                else
+                {
+                    select = Console.ReadLine();
+                }
+                if (select == "0")
+                {
+                    return "グー";
+                }
+                else if (select == "1")
+                {
+                    return "チョキ";
+                }
+                else if (select == "2")
+                {
+                    return "パー";
+                }
+                else
+                {
+                    return "\0";
+                }
+            }
+        }
+
+        static void Injanken()
+        {
+            ChatSystem.Buffer buffer = new ChatSystem.Buffer(maxLength);
+            bool turn = (connectMode == ChatSystem.ConnectMode.host);
+            string received = string.Empty;
+            string Hhand;
+            string Chand;
+            while (true)
+            {
+                if (turn)
+                {   // 受信
+                    buffer = new ChatSystem.Buffer(maxLength);
+                    ChatSystem.EResult re = chatSystem.Receive(buffer);
+                    if (re == ChatSystem.EResult.success)
+                    {
+                        received = Encoding.UTF8.GetString(buffer.content).Replace(EOF, "");
+                        int l = received.Length;
+                        if (received[0] != '\0')
+                        {   // 正常にメッセージを受信
+                            Console.WriteLine($"受信メッセージ：{received}");
+                        }
+                        else
+                        {   // 正常に終了を受信
+                            Console.WriteLine("相手から終了を受信");
+                            break;
+                        }
+                    }
+                    else
+                    {   //　受信エラー
+                        Console.WriteLine($"受信エラー：{chatSystem.resultMessage} ");
+                        break;
+                    }
+                }
+                else
+                {   // 送信
+                    string inputSt = string.Empty;
+                    //Console.Write("送るメッセージ：");
+                    if (connectMode == ChatSystem.ConnectMode.host)
+                    {   // Host
+                        Hhand = Hand();
+                        if (Hhand.Contains("グー"))
+                        {
+                            if (received.Contains("グー"))
+                            {
+                                inputSt = "ホストの手：グー\nあいこ";
+                                Console.WriteLine("ホストの手：グー\nあいこ");
+                            }
+                            else if (received.Contains("パー"))
+                            {
+                                inputSt = "ホストの手：グー\n勝ち";
+                                Console.WriteLine("ホストの手：グー\n勝ち");
+                            }
+                            else
+                            {
+                                inputSt = "ホストの手：グー\n負け";
+                                Console.WriteLine("ホストの手：グー\n負け");
+                            }
+                        }
+                        else if (Hhand.Contains("チョキ"))
+                        {
+                            if (received.Contains("グー"))
+                            {
+                                inputSt = "ホストの手：チョキ\n勝ち";
+                                Console.WriteLine("ホストの手：チョキ\n勝ち");
+                            }
+                            else if (received.Contains("パー"))
+                            {
+                                inputSt = "ホストの手：チョキ\n負け";
+                                Console.WriteLine("ホストの手：チョキ\n負け");
+                            }
+                            else
+                            {
+                                inputSt = "ホストの手：チョキ\nあいこ";
+                                Console.WriteLine("ホストの手：チョキ\nあいこ");
+                            }
+                        }
+                        else
+                        {
+                            if (received.Contains("グー"))
+                            {
+                                inputSt = "ホストの手：パー\n負け";
+                                Console.WriteLine("ホストの手：パー\n負け");
+                            }
+                            else if (received.Contains("パー"))
+                            {
+                                inputSt = "ホストの手：パー\nあいこ";
+                                Console.WriteLine("ホストの手：パー\nあいこ");
+                            }
+                            else
+                            {
+                                inputSt = "ホストの手：パー\n勝ち";
+                                Console.WriteLine("ホストの手：パー\n勝ち");
+                            }
+                        }
+                    }
+                    else
+                    {   // Client
+                        inputSt = Hand(); // 入力文字で送信
+                        Chand = inputSt;
+                        if (inputSt.Length > maxLength)
+                        {
+                            inputSt = inputSt.Substring(0, maxLength - EOF.Length);
+                        }
+                    }
+
                     inputSt += EOF;
                     buffer.content = Encoding.UTF8.GetBytes(inputSt);
                     buffer.length = buffer.content.Length;
