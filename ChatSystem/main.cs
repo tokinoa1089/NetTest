@@ -131,9 +131,37 @@ namespace ChatSystem
                     string inputSt = string.Empty;
                     Console.Write("送るメッセージ：");
                     if(connectMode == ChatSystem.ConnectMode.host)
-                    {   // Host
-                        inputSt = "同じ返事しかしませんよ";
-                        Console.Write(inputSt);
+                    { // Host
+                        if (received.Contains("生きたいと言え"))
+                        {
+                             inputSt = "い゛き゛た゛い゛！！！！";
+                             Console.Write(inputSt);
+                        }
+                        else if (received.Contains("おはよう"))
+                        {
+                             inputSt = "おはてぃうす";
+                             Console.Write(inputSt);
+                        }
+                        else if (received.Contains("こんにちは"))
+                        {
+                             inputSt = "こん＾＾";
+                             Console.Write(inputSt);
+                        }
+                        else if (received.Contains("こんばんは"))
+                        {
+                             inputSt = "( ˘ω˘)ｽﾔｧ";
+                             Console.Write(inputSt);
+                        }
+                        else if (received.Contains("すき"))
+                        {
+                             inputSt = "いっぱいちゅき";
+                             Console.Write(inputSt);
+                        }
+                        else
+                        {
+                             inputSt = "生きたいと言え";
+                             Console.Write(inputSt);
+                        }
                     }
                     else
                     {   // Client
