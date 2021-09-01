@@ -321,54 +321,54 @@ namespace ChatSystem
                         {
                             if (received.Contains("グー"))
                             {
-                                inputSt = "ホストの手：グー\nあいこ";
-                                Console.WriteLine("ホストの手：グー\nあいこ");
+                                inputSt = "ホスト：グー\nあいこ";
+                                Console.WriteLine("ホスト：グー\nあいこ");
                             }
                             else if (received.Contains("パー"))
                             {
-                                inputSt = "ホストの手：グー\n勝ち";
-                                Console.WriteLine("ホストの手：グー\n勝ち");
+                                inputSt = "ホスト：グー\n勝ち";
+                                Console.WriteLine("ホスト：グー\n勝ち");
                             }
                             else
                             {
-                                inputSt = "ホストの手：グー\n負け";
-                                Console.WriteLine("ホストの手：グー\n負け");
+                                inputSt = "ホスト：グー\n負け";
+                                Console.WriteLine("ホスト：グー\n負け");
                             }
                         }
                         else if (Hhand.Contains("チョキ"))
                         {
                             if (received.Contains("グー"))
                             {
-                                inputSt = "ホストの手：チョキ\n勝ち";
-                                Console.WriteLine("ホストの手：チョキ\n勝ち");
+                                inputSt = "ホスト：チョキ\n勝ち";
+                                Console.WriteLine("ホスト：チョキ\n勝ち");
                             }
                             else if (received.Contains("パー"))
                             {
-                                inputSt = "ホストの手：チョキ\n負け";
-                                Console.WriteLine("ホストの手：チョキ\n負け");
+                                inputSt = "ホスト：チョキ\n負け";
+                                Console.WriteLine("ホスト：チョキ\n負け");
                             }
                             else
                             {
-                                inputSt = "ホストの手：チョキ\nあいこ";
-                                Console.WriteLine("ホストの手：チョキ\nあいこ");
+                                inputSt = "ホスト：チョキ\nあいこ";
+                                Console.WriteLine("ホスト：チョキ\nあいこ");
                             }
                         }
                         else
                         {
                             if (received.Contains("グー"))
                             {
-                                inputSt = "ホストの手：パー\n負け";
-                                Console.WriteLine("ホストの手：パー\n負け");
+                                inputSt = "ホスト：パー\n負け";
+                                Console.WriteLine("ホスト：パー\n負け");
                             }
                             else if (received.Contains("パー"))
                             {
-                                inputSt = "ホストの手：パー\nあいこ";
-                                Console.WriteLine("ホストの手：パー\nあいこ");
+                                inputSt = "ホスト：パー\nあいこ";
+                                Console.WriteLine("ホスト：パー\nあいこ");
                             }
                             else
                             {
-                                inputSt = "ホストの手：パー\n勝ち";
-                                Console.WriteLine("ホストの手：パー\n勝ち");
+                                inputSt = "ホスト：パー\n勝ち";
+                                Console.WriteLine("ホスト：パー\n勝ち");
                             }
                         }
                     }
